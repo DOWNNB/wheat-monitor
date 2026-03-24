@@ -1,0 +1,38 @@
+name: Build Windows amd64 EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+
+      - name: Install dependencies
+        run: |
+          pip install pyinstaller PyQt6 matplotlib pillow requests numpy
+
+      - name: Build EXE
+        run: |
+          pyinstaller --onefile --windowed `
+            --name "冬小麦长势监测系统" `
+            --add-data "app_qt.py;." `
+            app_qt.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 冬小麦长势监测系统-Windows-amd64
+          path: dist/冬小麦长势监测系统.exe
+          retention-days: 30
